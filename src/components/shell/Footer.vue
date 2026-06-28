@@ -4,7 +4,7 @@ import '@/assets/css/footer.css';
 import version from '@/json/version.json'
 
 const releaseDateFormatted = computed(() => {
-  const date = Date.parse(version.release_date);
+  const date = Date.parse(version.releaseDate);
   const formatter = new Intl.DateTimeFormat('ru');
   return formatter.format(date);
 })

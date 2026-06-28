@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <div class="main mx-auto">
-    <small class="text-warning">{{ messages.controller_warning_message }}</small>
+    <small class="text-warning">{{ messages.controllerWarningMessage }}</small>
     <h1 class="title">{{ title }}</h1>
     <div class="settings mx-auto">
       <slot></slot>

@@ -1,13 +1,13 @@
 {
-  "github_url": "https://github.com/PartyGDK",
+  "githubUrl": "https://github.com/PartyGDK",
   "connection": {
     "host": "127.0.0.1",
     "port": 2096,
     "secure": false,
-    "websocket_suffix": "",
-    "get_room_url": "/getRoom"
+    "webSocketSuffix": "",
+    "getRoomUrl": "/getRoom"
   },
   "websocket": {
-    "ping_interval": 30
+    "pingInterval": 30
   }
 }

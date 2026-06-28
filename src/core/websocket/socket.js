@@ -17,7 +17,7 @@ export function connect(url) {
   }
 
   socket.onopen = (_) => {
-    const interval = config.websocket.ping_interval || 30;
+    const interval = config.websocket.pingInterval || 30;
     if (interval > 0) {
       pingInterval = setInterval(() => {
         send({ key: 'ping', val: { } });

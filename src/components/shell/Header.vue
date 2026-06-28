@@ -9,7 +9,7 @@ const links = ref([
 ])
 
 const iconLinks = ref([
-  { image: 'controller/github.svg', alt: 'GitHub Icon', url: config.github_url }
+  { image: 'controller/github.svg', alt: 'GitHub Icon', url: config.githubUrl }
 ])
 </script>
 

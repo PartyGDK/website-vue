@@ -9,13 +9,13 @@ export function getConnectionURL(websocket, moderator) {
     config.connection.host,
     ':',
     config.connection.port,
-    websocket ? config.connection.websocket_suffix : ''
+    websocket ? config.connection.webSocketSuffix : ''
   ]
 
   if (websocket)
     parts.push(moderator ? '/moderate' : '/play');
   else
-    parts.push(config.connection.get_room_url);
+    parts.push(config.connection.getRoomUrl);
 
   return parts.join('');
 }
