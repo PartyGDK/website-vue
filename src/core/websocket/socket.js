@@ -27,12 +27,13 @@ export function connect(url) {
     emitter.emit('open');
   }
 
-  socket.onclose = (_) => {
+  socket.onclose = (event) => {
     if (pingInterval) {
       clearInterval(pingInterval);
     }
 
-    emitter.emit('close');
+    emitter.emit('close', event);
+    console.debug(`Socket closed with code ${event.code}. Reason: ${event.reason}`);
   }
 
   socket.onerror = (_) => {

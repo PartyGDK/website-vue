@@ -7,6 +7,30 @@ import { addQueryParameters, getConnectionURL } from "@/utils/connection";
 import { escapeHTML, getCookie, reloadWithoutQuery, setCookie, swalError } from "@/utils/controller";
 
 
+const SocketErrorMessages = {
+  1011: 'Внутренняя ошибка сервера',
+  4000: 'Данные указаны неверно',
+  4001: 'Необходима авторизация через Twitch для этой комнаты',
+  4002: 'Неверный пароль',
+  4003: null,
+  4004: 'Комната не найдена',
+  4005: 'Лимит запросов исчерпан. Повторите попытку позже.',
+  4006: 'Комната заполнена',
+  4007: 'Игра уже началась',
+  4008: 'Достигнуто максимальное число зрителей в этой комнате',
+  4009: 'Сервер не поддерживает авторизацию через Twitch',
+  4010: 'Произошла ошибка при проверке Twitch-токена',
+  4011: 'Лимит клиентов для данного IP-адреса исчерпан',
+  4012: 'Зрители отключены для этой комнаты',
+  4013: 'Модерация отключена для этой комнаты',
+  4015: 'Комната создана, но не активирована',
+  4016: 'Этот игрок не отключён',
+  4017: 'Данное имя уже используется другим игроком',
+  4019: 'Роль указана неверно',
+  4020: 'Путь указан неверно',
+  4021: 'Не удалось получить IP-адрес клиента'
+}
+
 export function play(password) {
   const store = useConnectionStore();
   if (store.connected || store.connecting)
@@ -103,9 +127,12 @@ function onWsError() {
   swalError('Произошла ошибка при подключении.');
 }
 
-function onWsClose() {
+function onWsClose(event) {
   const connStore = useConnectionStore();
   const wsStore = useWebsocketStore();
+
+  const code = event.code;
+  const reason = event.reason;
 
   const errors = {
     'Incorrect password': 'Неверный пароль.',
@@ -120,16 +147,19 @@ function onWsClose() {
   };
 
   connStore.connecting = false;
-  if (wsStore.error && Date.now() - wsStore.errorTime <= 5000) {
+  if (SocketErrorMessages[code] !== undefined)
+    wsStore.error = SocketErrorMessages[code] || reason;
+
+  if (wsStore.error && (Date.now() - wsStore.errorTime <= 5000 || SocketErrorMessages[code] !== undefined)) {
     swalError(errors[wsStore.error] || escapeHTML(wsStore.error), 'Ошибка', connStore.connected);
   } else {
     let description;
     if (wsStore.kicked) {
       description = 'Вы были исключены модератором.';
       if (wsStore.kickReason)
-        description += `<br>Причина: ${escapeHTML(wsStore.kickReason)}`;
+        description += ` Причина: ${escapeHTML(wsStore.kickReason)}`;
       else
-        description += '<br>Причина не указана.';
+        description += ' Причина не указана.';
     }
 
     if (description)
