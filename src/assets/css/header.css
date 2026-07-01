@@ -6,7 +6,7 @@ header {
   background-color: var(--color-tertiary);
   padding: 8px 32px;
   min-height: 72px;
-  margin-bottom: 64px;
+  margin-bottom: 48px;
 }
 
 header .logo {

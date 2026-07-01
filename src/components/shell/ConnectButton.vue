@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { play } from '@/core/websocket/connection';
 import { useConnectionStore } from '@/stores/connection';
 import { setCookie, swalError } from '@/utils/controller';
+import { getToken } from '@/utils/twitch';
 
 const store = useConnectionStore();
 const props = defineProps({
@@ -29,19 +30,22 @@ function onClick() {
   const codeField = document.getElementById('roomCode');
   const roomCode = codeField.value.toUpperCase();
   if (roomCode.length < codeField.maxLength) {
-  return swalError('Неверно введён код комнаты.');
+    return swalError('Неверно введён код комнаты.');
   }
 
   let password;
   if (store.connectionData.moderator) {
-  password = document.getElementById('password').value;
+    password = document.getElementById('password').value;
   } else {
-  const playerName = document.getElementById('playerName').value.trim();
-  if (playerName.length === 0)
-    return swalError('Укажите имя.');
+    const playerName = document.getElementById('playerName').value.trim();
+    if (playerName.length === 0)
+      return swalError('Укажите имя.');
 
-  store.connectionData.playerName = playerName;
-  setCookie('playerName', playerName);
+    store.connectionData.playerName = playerName;
+    setCookie('playerName', playerName);
+
+    const authToken = getToken();
+    store.connectionData.authToken = authToken;
   }
 
   store.connectionData.roomCode = roomCode;

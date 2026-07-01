@@ -18,7 +18,6 @@ const props = defineProps({
 
 <style scoped>
 .main {
-  margin-top: 64px;
   text-align: center;
   max-width: 512px;
 }

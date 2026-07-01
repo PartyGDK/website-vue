@@ -5,6 +5,7 @@ import { useRuntimeStore } from "@/stores/runtime";
 import { useWebsocketStore } from "@/stores/websocket";
 import { addQueryParameters, getConnectionURL } from "@/utils/connection";
 import { escapeHTML, getCookie, reloadWithoutQuery, setCookie, swalError } from "@/utils/controller";
+import { isAuthenticationAvailable } from "@/utils/twitch";
 
 
 const SocketErrorMessages = {
@@ -40,24 +41,31 @@ export function play(password) {
   if (store.connectionData.moderator && !password)
     return swalError('Укажите пароль модератора.');
 
-  if (!store.connectionData.moderator && store.connectionData.role === 'player' && store.roomData.passwordRequired && !password) {
-    let text = 'Чтобы зайти как игрок, нужно ввести 5-значный пароль.';
-    if (store.roomData.audienceEnabled)
-      text += ' Если у вас нет пароля, вы можете попробовать присоединиться к зрителям.';
+  if (!store.connectionData.moderator && store.connectionData.role === 'player') {
+    if (store.roomData.authRequired && !store.connectionData.authToken)
+      return swalError(isAuthenticationAvailable() ?
+    'Необходима авторизация через Twitch.' :
+    'Необходима авторизация через Twitch, однако данный сайт её не поддерживает.');
 
-    return Swal.fire({
-      title: 'Требуется пароль',
-      text: text,
-      input: 'password',
-      inputAttributes: {
-        maxlength: 5,
-        autocomplete: 'off'
-      },
-      confirmButtonText: 'Подтвердить',
-      preConfirm: password => {
-        play(password)
-      }
-    })
+    if (store.roomData.passwordRequired && !password) {
+      let text = 'Чтобы зайти как игрок, нужно ввести 5-значный пароль.';
+      if (store.roomData.audienceEnabled)
+        text += ' Если у вас нет пароля, вы можете попробовать присоединиться к зрителям.';
+
+      return Swal.fire({
+        title: 'Требуется пароль',
+        text: text,
+        input: 'password',
+        inputAttributes: {
+          maxlength: 5,
+          autocomplete: 'off'
+        },
+        confirmButtonText: 'Подтвердить',
+        preConfirm: password => {
+          play(password)
+        }
+      })
+    }
   }
 
   store.connecting = true;
@@ -79,6 +87,9 @@ export function play(password) {
     role: store.connectionData.role,
     id: crypto.randomUUID()
   }
+
+  if (store.connectionData.authToken && !store.connectionData.moderator)
+    params.authToken = store.connectionData.authToken;
 
   const playerId = getCookie('playerId');
   if (playerId)
